@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de usuario</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+</head>
+<body data-page="registro">
+  <main class="container">
+    <div class="register-card">
+      <div class="register-head">Registro de usuario</div>
+      <div class="register-body">
+        <form id="register-form" class="form" novalidate>
+          <div class="group">
+            <label for="name">NOMBRE COMPLETO</label>
+            <input id="name" name="name" type="text" autocomplete="name" required />
+            <div class="error" id="e-name"></div>
+          </div>
+
+          <div class="group">
+            <label for="email">CORREO</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+            <div class="error" id="e-email"></div>
+          </div>
+
+          <div class="group">
+            <label for="email2">CONFIRMAR CORREO</label>
+            <input id="email2" name="email2" type="email" autocomplete="email" required />
+            <div class="error" id="e-email2"></div>
+          </div>
+
+          <div class="group">
+            <label for="password">CONTRASEÑA</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" minlength="6" required />
+            <div class="error" id="e-password"></div>
+          </div>
+
+          <div class="group">
+            <label for="password2">CONFIRMAR CONTRASEÑA</label>
+            <input id="password2" name="password2" type="password" autocomplete="new-password" required />
+            <div class="error" id="e-password2"></div>
+          </div>
+
+          <div class="group">
+            <label for="phone">TELEFONO (opcional)</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel"
+              placeholder="Ej: +56912345678"
+              pattern="^[+\d][\d\s-]{7,15}$"
+              title="Ej: +56912345678" />
+            <div class="error" id="e-phone"></div>
+          </div>
+
+          <div class="row">
+            <div class="group">
+              <label for="region">— Seleccione la región —</label>
+              <select id="region" name="region" required>
+                <option value="">-- Seleccione la región --</option>
+              </select>
+              <div class="error" id="e-region"></div>
+            </div>
+            <div class="group">
+              <label for="comuna">— Seleccione la comuna —</label>
+              <select id="comuna" name="comuna" required disabled>
+                <option value="">-- Seleccione la comuna --</option>
+              </select>
+              <div class="error" id="e-comuna"></div>
+            </div>
+          </div>
+
+          <button class="btn center" type="submit">REGISTRAR</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts comunes -->
+  <script src="js/data.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/common.js"></script>
+  <script>renderShell('registro');</script>
+
+  <!-- Script de validación y regiones -->
+  <script>
+    const REGIONES = {
+      "Región Metropolitana de Santiago": ["Santiago","Maipú","Puente Alto","Las Condes"],
+      "Región de la Araucanía": ["Temuco","Padre Las Casas","Villarrica"],
+      "Región de Ñuble": ["Chillán","San Carlos","Coihueco"],
+      "Región del Maule": ["Linares","Longaví","Talca"],
+      "Región del Biobío": ["Concepción","Talcahuano","Los Ángeles"]
+    };
+
+    const selRegion = document.getElementById('region');
+    const selComuna = document.getElementById('comuna');
+    Object.keys(REGIONES).forEach(r => {
+      const op = document.createElement('option');
+      op.value = r; op.textContent = r; selRegion.appendChild(op);
+    });
+
+    selRegion.addEventListener('change', () => {
+      selComuna.innerHTML = '<option value="">-- Seleccione la comuna --</option>';
+      const lista = REGIONES[selRegion.value] || [];
+      lista.forEach(c => {
+        const op = document.createElement('option');
+        op.value = c; op.textContent = c; selComuna.appendChild(op);
+      });
+      selComuna.disabled = lista.length === 0;
+    });
+
+    const form = document.getElementById('register-form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      ["name","email","email2","password","password2","phone","region","comuna"]
+        .forEach(id => document.getElementById('e-'+id)?.textContent = "");
+
+      const data = {
+        name: form.name.value.trim(),
+        email: form.email.value.trim().toLowerCase(),
+        email2: form.email2.value.trim().toLowerCase(),
+        password: form.password.value,
+        password2: form.password2.value,
+        phone: form.phone.value.trim(),
+        region: form.region.value,
+        comuna: form.comuna.value
+      };
+
+      let ok = true;
+      if (!data.name) { ok=false; document.getElementById('e-name').textContent = "Ingresa tu nombre completo."; }
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRe.test(data.email)) { ok=false; document.getElementById('e-email').textContent = "Correo inválido."; }
+      if (data.email !== data.email2) { ok=false; document.getElementById('e-email2').textContent = "Los correos no coinciden."; }
+      if (data.password.length < 6) { ok=false; document.getElementById('e-password').textContent = "Mínimo 6 caracteres."; }
+      if (data.password !== data.password2) { ok=false; document.getElementById('e-password2').textContent = "Las contraseñas no coinciden."; }
+      if (data.phone && !/^[+\d][\d\s-]{7,15}$/.test(data.phone)) {
+        ok=false; document.getElementById('e-phone').textContent = "Teléfono inválido.";
+      }
+      if (!data.region) { ok=false; document.getElementById('e-region').textContent = "Selecciona una región."; }
+      if (!data.comuna) { ok=false; document.getElementById('e-comuna').textContent = "Selecciona una comuna."; }
+
+      if (!ok) return;
+
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      if (users.some(u => u.email === data.email)) {
+        document.getElementById('e-email').textContent = "Ese correo ya está registrado.";
+        return;
+      }
+      users.push({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        phone: data.phone,
+        region: data.region,
+        comuna: data.comuna
+      });
+      localStorage.setItem('users', JSON.stringify(users));
+
+      alert('Registro exitoso');
+      location.href = 'login.html';
+    });
+  </script>
+  <script src="js/pages.js"></script>
+</body>
+</html>

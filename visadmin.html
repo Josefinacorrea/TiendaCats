@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel de Administrador</title>
+
+  <link rel="icon" type="image/png" href="images/logo.png">
+
+  <link rel="preload" href="css/style.css" as="style">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-page="admin">
+
+  <main class="container">
+    <h1 class="mt-2">¡HOLA Administrador!</h1>
+
+    <nav class="tabs mt-2">
+      <a href="#tab-productos" class="tab active" data-tab="productos">Productos</a>
+      <a href="#tab-usuarios" class="tab" data-tab="usuarios">Usuarios</a>
+    </nav>
+
+    <section id="tab-productos" class="card mt-2">
+      <div class="p">
+        <div class="flex between center">
+          <h2>Gestión de Productos</h2>
+          <button id="btn-nuevo" class="btn">Nuevo Producto</button>
+        </div>
+        <div id="tabla-productos" class="mt-2"></div>
+      </div>
+    </section>
+
+    <section id="tab-usuarios" class="card mt-2 hidden">
+      <div class="p">
+        <h2>Mantenedor de Usuarios</h2>
+        <div id="form-usuario" class="mt-2"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/data.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/common.js" defer></script>
+
+  <script src="js/administrador.js" defer></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      renderShell('admin');
+
+      const tabs = document.querySelectorAll('.tab');
+      const panes = [document.getElementById('tab-productos'), document.getElementById('tab-usuarios')];
+      tabs.forEach(t => t.addEventListener('click', e => {
+        e.preventDefault();
+        tabs.forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        panes.forEach(p => p.classList.add('hidden'));
+        const pane = document.querySelector(`#tab-${t.dataset.tab}`);
+        pane && pane.classList.remove('hidden');
+      }));
+    });
+  </script>
+</body>
+</html>
