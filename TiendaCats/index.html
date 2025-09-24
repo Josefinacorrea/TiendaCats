@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tienda de Gatitos — Inicio</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="home">
+  <main class="container">
+    <section class="hero">
+      <h1>Tienda de Gatitos</h1>
+      <p>Todo lo que tu felino necesita.</p>
+    </section>
+
+    <section>
+      <h2>Productos destacados</h2>
+      <div id="products-grid" class="grid products"></div>
+      <div class="center mt-3">
+        <a class="btn" href="productos.html">Ver todo el catálogo</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/common.js"></script>
+  <script>renderShell('home');</script>
+  <script src="js/pages.js"></script>
+</body>
+</html>
